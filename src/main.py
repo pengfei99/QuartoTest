@@ -55,6 +55,11 @@ report_structure = [
 context = {
     "title": "Rapport de Validation",
     "author": "Équipe Qualité",
+    "etude" : "Etude constances",
+    "extraction": "Extraction 1",
+    "year_ext_start": "2000",
+    "year_ext_end": "2020",
+    "domain_list": "DCIR, DC, COVID",
     "date": datetime.date.today().strftime("%d/%m/%Y"),
     "report_structure": report_structure
 }
@@ -62,7 +67,7 @@ context = {
 
 # Jinja2 render
 env = Environment(loader=FileSystemLoader("./templates"), autoescape=True)
-template = env.get_template("report.html.j2")
+template = env.get_template("report.html")
 rendered_html = template.render(context)
 
 # Save HTML report
@@ -70,8 +75,3 @@ out_html_file = "../tmp/report.html"
 with open(out_html_file, "w", encoding="utf-8") as f:
     f.write(rendered_html)
 
-# Generate PDF
-# pdf_file = "report.pdf"
-# HTML(html_file).write_pdf(pdf_file)
-
-# print(f"Report saved: {html_file} and {pdf_file}")

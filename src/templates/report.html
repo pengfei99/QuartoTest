@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        .report-title {
+            text-align: center;
+            color: #3366cc;
+        }
+
+        .subtitle-section {
+            text-align: left;
+            width: 60vw;
+            max-width: 500px;
+            padding: 15px 25px;
+            border: 2px solid #444;
+            border-radius: 15px;
+            font-size: 1rem;
+            line-height: 1.5;
+            box-sizing: border-box;
+        }
+
+        .subtitle-wrapper {
+            display: flex;
+            justify-content: center;
+        }
+
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2em;
+            counter-reset: page;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: #2c3e50;
+            margin-top: 1.5em;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f5f5f5;
+        }
+
+        img {
+            max-width: 100%;
+            margin: 1em 0;
+        }
+
+        .section {
+            margin-bottom: 2em;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 1em;
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: #2980b9;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        @page {
+            @bottom-right {
+                content: "Page " counter(page);
+            }
+        }
+
+        .page-number::after {
+            content: leader('.') target-counter(attr(href), page);
+            float: right;
+        }
+    </style>
+</head>
+<body>
+
+<h1 class="report-title">{{ title }}</h1>
+<div class="subtitle-wrapper">
+    <div class="subtitle-section">
+        <p>
+            <strong>Auteur :</strong> {{ author }}<br>
+            <strong>Etude : </strong> {{ etude }}<br>
+            <strong>Extraction : </strong> {{ extraction }}<br>
+            <strong>Première année de flux de l’extraction : </strong> {{ year_ext_start }}<br>
+            <strong>Dernière année de flux de l’extraction : </strong> {{ year_ext_end }}<br>
+            <strong>Liste des domaines de l’extraction : </strong> {{ domain_list }}<br>
+            <strong>Date :</strong> {{ date }}
+        </p>
+    </div>
+</div>
+
+<hr>
+
+<div class="toc">
+    <h2>Table des matières</h2>
+    {% macro render_toc_auto(section_list, prefix="") %}
+    <ul>
+        {% for section in section_list %}
+        {% set number = prefix ~ (loop.index) %}
+        <li>
+            <a class="page-number" href="#s{{ number }}">{{ number }} {{ section.title }}</a>
+            {% if section.children %}
+            {{ render_toc_auto(section.children, number ~ ".") }}
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endmacro %}
+    {{ render_toc_auto(report_structure) }}
+</div>
+
+<hr>
+
+{% macro render_section_auto(section_list, level=2, prefix="") %}
+{% for section in section_list %}
+{% set number = prefix ~ (loop.index) %}
+<div class="section">
+    <h
+            {{ level }} id="s{{ number }}">{{ number }} {{ section.title }}
+    </h{{ level }}>
+            {% if section.description %}
+    <p>{{ section.description }}</p>
+    {% endif %}
+    {% if section.table_html %}
+    {{ section.table_html | safe }}
+    {% endif %}
+    {% if section.image_path %}
+    <img src="{{ section.image_path }}" alt="Plot for {{ section.title }}">
+    {% endif %}
+    {% if section.children %}
+    {{ render_section_auto(section.children, level+1, number ~ ".") }}
+    {% endif %}
+</div>
+{% endfor %}
+{% endmacro %}
+
+{{ render_section_auto(report_structure) }}
+
+</body>
+</html>
